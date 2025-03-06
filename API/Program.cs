@@ -2,12 +2,14 @@ using API.Middleware;
 using application.Activities.Queries;
 using application.Activities.Validators;
 using application.Core;
+using application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using persistence;
 
@@ -26,6 +28,8 @@ builder.Services.AddMediatR(x => {
     x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
     });
+
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
@@ -35,7 +39,15 @@ builder.Services
             opt.User.RequireUniqueEmail = true;
         })
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>();   
+    .AddEntityFrameworkStores<AppDbContext>(); 
+builder.Services.AddAuthorization(opt => 
+{
+    opt.AddPolicy("IsActivityHost", policy => 
+    {
+        policy.Requirements.Add(new IsHostRequirement());
+    });
+}); 
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 var app = builder.Build();
 

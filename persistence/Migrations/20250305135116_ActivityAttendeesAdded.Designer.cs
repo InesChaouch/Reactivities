@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using persistence;
 
@@ -10,9 +11,11 @@ using persistence;
 namespace persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305135116_ActivityAttendeesAdded")]
+    partial class ActivityAttendeesAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -69,7 +72,7 @@ namespace persistence.Migrations
                     b.Property<DateTime>("DateJoined")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsHost")
+                    b.Property<bool>("IsMost")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ActivityId", "UserId");
